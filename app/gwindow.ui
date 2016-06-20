@@ -1,0 +1,703 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>GWindow</class>
+ <widget class="QMainWindow" name="GWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>743</width>
+    <height>506</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>GWindow</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="nomain/res.qrc">
+    <normaloff>:/img/logo.png</normaloff>:/img/logo.png</iconset>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item row="0" column="0">
+     <widget class="QMdiArea" name="mdiArea"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>743</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>Файл</string>
+    </property>
+    <addaction name="mmLoad"/>
+    <addaction name="mmSave"/>
+   </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>Настройки</string>
+    </property>
+    <addaction name="mmVisual"/>
+    <addaction name="mmSignal"/>
+   </widget>
+   <widget class="QMenu" name="menu_3">
+    <property name="title">
+     <string>Графики</string>
+    </property>
+    <addaction name="mmTile"/>
+    <addaction name="separator"/>
+    <addaction name="mmGpolarization"/>
+    <addaction name="mmVpolarization"/>
+    <addaction name="separator"/>
+    <addaction name="mmOsc"/>
+    <addaction name="mmSpectr"/>
+    <addaction name="mmExperiment"/>
+    <addaction name="mmRastr"/>
+    <addaction name="mmAFRastr"/>
+    <addaction name="mm3Dmodel"/>
+   </widget>
+   <widget class="QMenu" name="menuPlugins">
+    <property name="title">
+     <string>Плагины</string>
+    </property>
+    <addaction name="mmPlugs"/>
+   </widget>
+   <widget class="QMenu" name="menuDebug">
+    <property name="title">
+     <string>Debug</string>
+    </property>
+    <addaction name="mmDebug"/>
+   </widget>
+   <widget class="QMenu" name="menu_4">
+    <property name="title">
+     <string>Режимы</string>
+    </property>
+    <addaction name="mmControlForm"/>
+   </widget>
+   <widget class="QMenu" name="devInterface">
+    <property name="title">
+     <string>Интерфейс</string>
+    </property>
+   </widget>
+   <addaction name="menu"/>
+   <addaction name="menu_2"/>
+   <addaction name="menu_3"/>
+   <addaction name="menuPlugins"/>
+   <addaction name="menuDebug"/>
+   <addaction name="menu_4"/>
+   <addaction name="devInterface"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QDockWidget" name="dockVisual">
+   <property name="minimumSize">
+    <size>
+     <width>287</width>
+     <height>35</height>
+    </size>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>Настройки вывода</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <widget class="QSlider" name="ArgMin">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>130</y>
+       <width>20</width>
+       <height>301</height>
+      </rect>
+     </property>
+     <property name="maximum">
+      <number>1024</number>
+     </property>
+     <property name="tracking">
+      <bool>false</bool>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="invertedAppearance">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_11">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>64</y>
+       <width>31</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Max</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_10">
+     <property name="geometry">
+      <rect>
+       <x>8</x>
+       <y>34</y>
+       <width>21</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Min</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_3">
+     <property name="geometry">
+      <rect>
+       <x>55</x>
+       <y>100</y>
+       <width>31</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Max</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_16">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>0</y>
+       <width>51</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Угол</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>100</y>
+       <width>21</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Min</string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="sPhMin">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>30</y>
+       <width>60</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="minimum">
+      <number>0</number>
+     </property>
+     <property name="maximum">
+      <number>180</number>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>0</y>
+       <width>71</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Дальность</string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="sArgMin">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>30</y>
+       <width>60</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="readOnly">
+      <bool>false</bool>
+     </property>
+     <property name="maximum">
+      <number>1024</number>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="sArgMax">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>60</y>
+       <width>60</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="readOnly">
+      <bool>false</bool>
+     </property>
+     <property name="maximum">
+      <number>1024</number>
+     </property>
+     <property name="value">
+      <number>1024</number>
+     </property>
+    </widget>
+    <widget class="QSlider" name="ArgMax">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>130</y>
+       <width>16</width>
+       <height>301</height>
+      </rect>
+     </property>
+     <property name="inputMethodHints">
+      <set>Qt::ImhMultiLine</set>
+     </property>
+     <property name="maximum">
+      <number>1024</number>
+     </property>
+     <property name="value">
+      <number>1024</number>
+     </property>
+     <property name="sliderPosition">
+      <number>1024</number>
+     </property>
+     <property name="tracking">
+      <bool>false</bool>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="invertedAppearance">
+      <bool>false</bool>
+     </property>
+     <property name="invertedControls">
+      <bool>false</bool>
+     </property>
+     <property name="tickPosition">
+      <enum>QSlider::NoTicks</enum>
+     </property>
+     <property name="tickInterval">
+      <number>0</number>
+     </property>
+    </widget>
+    <widget class="QSlider" name="PhMin">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>130</y>
+       <width>20</width>
+       <height>301</height>
+      </rect>
+     </property>
+     <property name="minimum">
+      <number>0</number>
+     </property>
+     <property name="maximum">
+      <number>180</number>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+     <property name="tracking">
+      <bool>false</bool>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="invertedAppearance">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QSlider" name="Barier">
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>130</y>
+       <width>21</width>
+       <height>301</height>
+      </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimum">
+      <number>0</number>
+     </property>
+     <property name="maximum">
+      <number>65535</number>
+     </property>
+     <property name="singleStep">
+      <number>1</number>
+     </property>
+     <property name="pageStep">
+      <number>128</number>
+     </property>
+     <property name="value">
+      <number>100</number>
+     </property>
+     <property name="tracking">
+      <bool>false</bool>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="tickPosition">
+      <enum>QSlider::NoTicks</enum>
+     </property>
+     <property name="tickInterval">
+      <number>25</number>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="sBarier">
+     <property name="geometry">
+      <rect>
+       <x>199</x>
+       <y>30</y>
+       <width>71</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="minimum">
+      <number>0</number>
+     </property>
+     <property name="maximum">
+      <number>65535</number>
+     </property>
+     <property name="singleStep">
+      <number>1</number>
+     </property>
+     <property name="value">
+      <number>100</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_17">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>0</y>
+       <width>51</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Порог</string>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+  <action name="mmLoad">
+   <property name="text">
+    <string>Загрузить</string>
+   </property>
+  </action>
+  <action name="mmSave">
+   <property name="text">
+    <string>Сохранить</string>
+   </property>
+  </action>
+  <action name="mmVisual">
+   <property name="text">
+    <string>Настройки обработки и вывода</string>
+   </property>
+  </action>
+  <action name="mmOsc">
+   <property name="text">
+    <string>Осциллограмма</string>
+   </property>
+  </action>
+  <action name="mmSpectr">
+   <property name="text">
+    <string>Спектр</string>
+   </property>
+  </action>
+  <action name="mmExperiment">
+   <property name="text">
+    <string>Эксперимент</string>
+   </property>
+  </action>
+  <action name="mmRastr">
+   <property name="text">
+    <string>Растр</string>
+   </property>
+  </action>
+  <action name="mm3Dmodel">
+   <property name="text">
+    <string>3D модель</string>
+   </property>
+  </action>
+  <action name="mmGpolarization">
+   <property name="text">
+    <string>Горизонтальная поляризация</string>
+   </property>
+  </action>
+  <action name="mmVpolarization">
+   <property name="text">
+    <string>Вертикальная поляризация</string>
+   </property>
+  </action>
+  <action name="mmPlugs">
+   <property name="text">
+    <string>Выбрать плагины</string>
+   </property>
+  </action>
+  <action name="mmSignal">
+   <property name="text">
+    <string>Настройки сигнала</string>
+   </property>
+  </action>
+  <action name="mmTile">
+   <property name="text">
+    <string>Замостить</string>
+   </property>
+  </action>
+  <action name="mmDebug">
+   <property name="text">
+    <string>Панель отладки</string>
+   </property>
+  </action>
+  <action name="mmAFRastr">
+   <property name="text">
+    <string>АФ Растр</string>
+   </property>
+  </action>
+  <action name="mm3Dmath">
+   <property name="text">
+    <string>3D Math</string>
+   </property>
+  </action>
+  <action name="mmControlForm">
+   <property name="text">
+    <string>Непрерывный запрос</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="nomain/res.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>mmVisual</sender>
+   <signal>triggered()</signal>
+   <receiver>dockVisual</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>649</x>
+     <y>251</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ArgMin</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>sArgMin</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>576</x>
+     <y>319</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>626</x>
+     <y>80</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sArgMin</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ArgMin</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>626</x>
+     <y>80</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>576</x>
+     <y>319</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ArgMax</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>sArgMax</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>624</x>
+     <y>319</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>626</x>
+     <y>110</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sArgMax</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ArgMax</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>626</x>
+     <y>110</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>624</x>
+     <y>319</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PhMin</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>sPhMin</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>706</x>
+     <y>319</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>706</x>
+     <y>80</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sPhMin</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>PhMin</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>706</x>
+     <y>80</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>706</x>
+     <y>319</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Barier</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>sBarier</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>690</x>
+     <y>319</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>690</x>
+     <y>80</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sBarier</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>Barier</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>690</x>
+     <y>80</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>690</x>
+     <y>319</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
