@@ -23,8 +23,10 @@ signals:
     void resultGorizontal(Clowd &dataArg,Clowd &dataPh);
     void resultVertical(Clowd &dataArg,Clowd &dataPh);
     void updateInterface();
+    void close();
 
 public slots:
+    void Process(QByteArray &data);
     void loadSrc(QByteArray &data);
     void loadFinished(QByteArray &data);
     void loadFinishedF(QByteArray &data);
@@ -34,7 +36,7 @@ public slots:
 private:
     QByteArray data;
     MathVector dataDouble;
-    Clowd dataFloat;
+    Clowd dataFloat, dataFloatA;
 
     float *OriginalPulseRe, *OriginalPulseIm;
     void initPulse(int leSubBufNum, double leFreq);
@@ -80,6 +82,13 @@ private:
     void sendMsg(QString info, QString address, quint16 port);
     void sendMsg(QByteArray info, QString address, quint16 port);
     void SendCmdPacket(unsigned short BufferSize, unsigned char *Buffer, unsigned short CmdNum);
+    int leSubBufNum, leBurstLen;
+    double leFreq;
+    int leNumberOfMultOsc;
+
+    int stepCurBufNum, lastStepCurBufNum;
+
+    uchar PlotBuf[65536*2];
 
 };
 

@@ -1,3 +1,4 @@
+#include <iostream>
 #include "gwindow.h"
 #include "ui_gwindow.h"
 #include <QFileDialog>
@@ -157,11 +158,25 @@ GWindow::GWindow(QWidget *parent) :
     dw["cf"]->setWidget(cf);
     this->setDockNestingEnabled(false);
     dw["cf"]->hide();
+
+
+    pl = new PolarisationGet;
+    connect(pl,&PolarisationGet::sync,control,&MControl::saveConfig);
+    dw["pl"] = new QDockWidget("Настройка поляризации",this);
+    dw["pl"]->setFloating(true);
+    dw["pl"]->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    //this->addDockWidget(Qt::RightDockWidgetArea,dw["fs"]);
+    dw["pl"]->setWidget(pl);
+    this->setDockNestingEnabled(false);
+    dw["pl"]->hide();
+
+
 }
 
 GWindow::~GWindow()
 {
     delete ui;
+    delete control;
 }
 void GWindow::loadPlugin(Plugs &plugin){
     if(plugins.contains(plugin.alias)){
@@ -369,4 +384,9 @@ void GWindow::on_mmOsc_triggered()
         control->showPlotOsc("vertical");
     else
         control->showPlotOsc("gorizontal");
+}
+
+void GWindow::on_mmPolarization_triggered()
+{
+    dw["pl"]->show();
 }

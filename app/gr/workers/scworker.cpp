@@ -93,7 +93,7 @@ void ScWorker::syncSlot(){
     MaxBarier = Memory::get("Barier",100).toInt();
     delY = (GLfloat)32.0f/(181-Memory::get("PhMin",0).toInt());
 
-    centerX = (GLfloat)Size/2;
+    centerX = (GLfloat)180.0;
     centerY =  AngleMin + (GLfloat) ( AngleMax - AngleMin ) /2;
     centerZ = OffsetMin + (GLfloat) ( OffsetMax - OffsetMin ) /2;
 }
@@ -110,7 +110,7 @@ void ScWorker::sharedSlot(int ship, QString type){
         nameA = "vGorizontalAr";
         nameP = "vGorizontalPh";
     }
-    int shipPosition = ship*BLOCKLANGTH*sizeof(float);
+    int shipPosition = ship*BLOCKLANGTH*sizeof(float)*2;
     Memory::getData(nameA,histA.data(),shipPosition);
     Memory::getData(nameP,histY.data(),shipPosition);
     plotSlot();
@@ -123,7 +123,7 @@ void ScWorker::dataSlot(Clowd &dataA, Clowd &dataH){
 void ScWorker::plotSlot(){
     if(histA.size() == 0)
         return;
-    centerX = (GLfloat)Size/2;
+    centerX = (GLfloat)180;
     centerY =  AngleMin + (GLfloat) ( AngleMax - AngleMin ) /2;
     centerZ = OffsetMin + (GLfloat) ( OffsetMax - OffsetMin ) /2;
     int realSize = 0;
@@ -133,10 +133,11 @@ void ScWorker::plotSlot(){
     m_data.resize( (OffsetMax-OffsetMin) * Size * 60*6);
     m_dataLink = m_data.data();
 
-    for( int x = 0; x < Size; x++){
+//    for( int x = 0; x < Size; x++){
         //номер пачки
-        int packet = x*BLOCKLANGTH;
+        int packet = 0;//x*BLOCKLANGTH;
         for(int z = OffsetMin; z < OffsetMax; z++){
+            int x = (int)histY[BLOCKLANGTH+z];
             int y = (int)histY[packet+z];
             if(y >= AngleMin && y <= AngleMax){
                 uint color = (uint)histA[packet+z];
@@ -147,7 +148,7 @@ void ScWorker::plotSlot(){
             }
         }
 
-    }
+    //}
 //    m_data.resize(realSize*24*6);
         m_data.resize(realSize*60*6);
     emit plot(m_data);

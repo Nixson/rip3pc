@@ -6,4 +6,4 @@ CONFIG  += ordered
 SUBDIRS += SecPrFFT
 SUBDIRS += Player
 
-TARGET = rip3p
+TARGET = rip3pc

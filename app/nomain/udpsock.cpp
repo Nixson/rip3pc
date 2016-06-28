@@ -4,6 +4,15 @@
 #include <QFile>
 #include "memory.h"
 
+
+#include <arpa/inet.h>
+#include <netinet/ether.h>
+#include <netinet/ip.h>
+#include <netinet/tcp.h>
+#include <netinet/udp.h>
+
+
+
 #include <iostream>
 using namespace std;
 
@@ -11,7 +20,9 @@ static const int PCAP_TIMEOUT = 10000;
 
 
 UDPSock::UDPSock(QObject *parent) : QObject(parent){}
-UDPSock::~UDPSock(){}
+UDPSock::~UDPSock(){
+    close();
+}
 void UDPSock::run(){
     fname = "";
     position = 0;
@@ -61,7 +72,7 @@ void UDPSock::listen(){
             while(isValid()){
                     res = pcap_next_ex(handle, &pktheader, &pktdata);
                     if(res == 1){
-                        cout << pktheader->len << endl;
+                        //cout << pktheader->len << endl;
                         packReady(pktdata,pktheader->len);
                     }
             }
@@ -80,17 +91,34 @@ void UDPSock::call(uchar *self, const pcap_pkthdr *header, const uchar *packet){
 
 
 void UDPSock::updateInterface(){
+    QString devNew = Memory::get("device","").toString();
+    int rlsPortNew = Memory::get("rlsPort",30583).toInt();
+    QString rlsHostNew = Memory::get("rlsIP","127.0.0.1").toString();
+    bool re = false;
+
+    if(devNew!=dev){
+        dev = devNew;
+        re = true;
+    }
+    if(rlsPortNew!=rlsPort){
+        rlsPort = rlsPortNew;
+        re = true;
+    }
+    if(rlsHostNew!=rlsHost){
+        rlsHost = rlsHostNew;
+        re = true;
+    }
+    if(!re)
+        return;
+
     if(isValid()){
         close();
-        cout << "close" << endl;
+
         QTimer::singleShot(1500,[=](){
             this->updateInterface();
         });
         return;
     }
-    QString dev = Memory::get("device","").toString();
-    int rlsPort = Memory::get("rlsPort",30583).toInt();
-    QString rlsHost = Memory::get("rlsIP","127.0.0.1").toString();
     QString filter ="ip src host "+rlsHost+" and udp dst port "+QString::number(rlsPort);
     if(dev.size() > 0){
         cout << filter.toStdString() << endl;
@@ -103,7 +131,10 @@ void UDPSock::updateInterface(){
     }
 }
 void UDPSock::packReady(const uchar *packet, int len){
-    QByteArray ba((const char *)packet,len);
-    cout << ba.toStdString() << endl;
+    int pos = len - 1046;
+    const uchar *payload = packet + pos;
+    const uchar *DataPtr = payload;
+    QByteArray ba((const char *)DataPtr,1046);
+    emit Process(ba);
 }
 

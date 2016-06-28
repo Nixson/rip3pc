@@ -13,6 +13,7 @@
 #include "nomain/rdata.h"
 #include "nomain/savefile.h"
 #include "nomain/controlform.h"
+#include "nomain/polarisationget.h"
 #include "memory.h"
 
 
@@ -63,6 +64,8 @@ private slots:
 
     void on_mmOsc_triggered();
 
+    void on_mmPolarization_triggered();
+
 signals:
     void setMemory(Rdata *mLink);
     void init();
@@ -79,6 +82,7 @@ private:
     QMap <QString, PlugWidgetInterfaces *> plugObject;
     SaveFile *sf;
     ControlForm *cf;
+    PolarisationGet *pl;
 };
 
 #endif // GWINDOW_H

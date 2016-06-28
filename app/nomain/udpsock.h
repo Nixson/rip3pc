@@ -14,10 +14,11 @@ public:
     static void call(uchar *self, const pcap_pkthdr *header, const uchar *packet);
 
 signals:
-    void sendSignal();
+    void Process(QByteArray &data);
 
 public slots:
     void updateInterface();
+    bool close();
 
     void packReady(const uchar *packet, int len);
 public:
@@ -32,11 +33,14 @@ private:
     bpf_program filter;
 
     void listen();
-    bool close();
     bool setFilter( const QString &filterexp );
     bool isValid();
     bool openConnection( const QString &dev, int snaplen, bool promisc );
     bool enough;
+
+    QString dev;
+    int rlsPort;
+    QString rlsHost;
 };
 
 #endif // UDPSOCK_H

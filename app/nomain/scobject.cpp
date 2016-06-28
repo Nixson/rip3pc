@@ -107,9 +107,10 @@ void ScObject::reLine(){
     l_count = 12*2*6;
     l_data.resize(24*6);
     sObjectLink = l_data.data();
-    centerX = (GLfloat)Size/2;
+    centerX = (GLfloat)180.0;
     centerY =  AngleMin + (GLfloat) ( AngleMax - AngleMin ) /2;
     centerZ = OffsetMin + (GLfloat) ( OffsetMax - OffsetMin ) /2;
+    int Size = 360;
     //top
     appendPoint(-1,AngleMin-1,OffsetMin-1);
     appendPoint(-1,AngleMin-1,OffsetMax+1);

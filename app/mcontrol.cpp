@@ -1,6 +1,7 @@
 #include "mcontrol.h"
 #include "memory.h"
 #include <QDockWidget>
+#include <iostream>
 
 MControl::MControl(QObject *parent) : QObject(parent), debug(new DebugDialog),
   isgr3dVmdi(false), isgr3dGmdi(false), isgrPlotVmdi(false), isgrPlotGmdi(false), isgrRPlotVmdi(false), isgrRPlotGmdi(false)

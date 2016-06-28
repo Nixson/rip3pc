@@ -6,4 +6,4 @@ CONFIG  += ordered
 SUBDIRS = plugins \
           app
 
-TARGET = rip3p
+TARGET = rip3pc

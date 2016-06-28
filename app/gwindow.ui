@@ -58,6 +58,7 @@
     </property>
     <addaction name="mmVisual"/>
     <addaction name="mmSignal"/>
+    <addaction name="mmPolarization"/>
    </widget>
    <widget class="QMenu" name="menu_3">
     <property name="title">
@@ -547,6 +548,11 @@
   <action name="mmControlForm">
    <property name="text">
     <string>Непрерывный запрос</string>
+   </property>
+  </action>
+  <action name="mmPolarization">
+   <property name="text">
+    <string>Настройки поляризации</string>
    </property>
   </action>
  </widget>

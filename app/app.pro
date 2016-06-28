@@ -6,7 +6,7 @@
 
 QT       += core gui widgets multimedia printsupport network
 
-TARGET = rip3p
+TARGET = rip3pc
 TEMPLATE = app
 
 
@@ -32,7 +32,8 @@ SOURCES += memory.cpp\
     gr/workers/prworker.cpp \
     nomain/savefile.cpp \
     nomain/controlform.cpp \
-    gr/plotosc.cpp
+    gr/plotosc.cpp \
+    nomain/polarisationget.cpp
 
 HEADERS  += memory.h \
     gwindow.h \
@@ -57,7 +58,8 @@ HEADERS  += memory.h \
     gr/workers/prworker.h \
     nomain/savefile.h \
     nomain/controlform.h \
-    gr/plotosc.h
+    gr/plotosc.h \
+    nomain/polarisationget.h
 
 FORMS    += gwindow.ui \
     gr/gr3d.ui \
@@ -70,7 +72,8 @@ FORMS    += gwindow.ui \
     gr/plotmath.ui \
     nomain/savefile.ui \
     nomain/controlform.ui \
-    gr/plotosc.ui
+    gr/plotosc.ui \
+    nomain/polarisationget.ui
 
 RESOURCES += \
     nomain/res.qrc
