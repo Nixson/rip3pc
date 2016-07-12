@@ -6,6 +6,7 @@
 MControl::MControl(QObject *parent) : QObject(parent), debug(new DebugDialog),
   isgr3dVmdi(false), isgr3dGmdi(false), isgrPlotVmdi(false), isgrPlotGmdi(false), isgrRPlotVmdi(false), isgrRPlotGmdi(false)
 {
+    // получение ранее сохраненных настроек
     settings = new QSettings("rip3p.ini",QSettings::IniFormat);
     Memory::resultData["Gorizontal"].clear();
     Memory::resultData["Vertical"].clear();
@@ -13,62 +14,7 @@ MControl::MControl(QObject *parent) : QObject(parent), debug(new DebugDialog),
     foreach (QString key, keys) {
          Memory::set(key,settings->value(key));
     }
-
-    /*Memory::set("Gpolarization",settings->value("Gpolarization",true));
-    Memory::set("Vpolarization",settings->value("Vpolarization",false));
-    Memory::set("Size",settings->value("Size",0));
-    Memory::set("Barier",settings->value("Barier",0));
-
-
-    Memory::set("xRotation",settings->value("xRotation",0));
-    Memory::set("yRotation",settings->value("yRotation",0));
-    Memory::set("zRotation",settings->value("zRotation",0));
-    Memory::set("VerticalScale",settings->value("VerticalScale",0));
-    Memory::set("VerticalSLideX",settings->value("VerticalSLideX",0));
-    Memory::set("VerticalSLideY",settings->value("VerticalSLideY",0));
-    Memory::set("VerticalSLideZ",settings->value("VerticalSLideZ",0));
-    Memory::set("GorizontalScale",settings->value("GorizontalScale",0));
-    Memory::set("GorizontalSLideX",settings->value("GorizontalSLideX",0));
-    Memory::set("GorizontalSLideY",settings->value("GorizontalSLideY",0));
-    Memory::set("GorizontalSLideZ",settings->value("GorizontalSLideZ",0));
-
-    Memory::set("leSubBufNum",settings->value("leSubBufNum",4));
-    Memory::set("leFreq",settings->value("leFreq",1777));
-    Memory::set("MaxColor",settings->value("MaxColor",QUINT16_SIZE));
-    Memory::set("colorValue",settings->value("colorValue",0));
-    Memory::set("ArgMin",settings->value("ArgMin",0));
-    Memory::set("ArgMax",settings->value("ArgMax",1024));
-    Memory::set("PhMin",settings->value("PhMin",0));
-    Memory::set("PhMax",settings->value("PhMax",180));
-    Memory::set("leBurstLen",settings->value("leBurstLen",1));
-    Memory::set("leGeterodin",settings->value("leGeterodin",8000));
-    Memory::set("leAmp",settings->value("leAmp",100));
-    Memory::set("leFreqRange",settings->value("leFreqRange",100));
-    Memory::set("leGateDelay",settings->value("leGateDelay",0));
-    Memory::set("leGateDuration",settings->value("leGateDuration",0.01));
-    Memory::set("cbPulseMod",settings->value("cbPulseMod",true));
-    Memory::set("cbUWB",settings->value("cbUWB",false));
-    Memory::set("cbLFM",settings->value("cbLFM",false));
-    Memory::set("lePeriod",settings->value("lePeriod",0.1));
-    Memory::set("leDuration",settings->value("leDuration",0.0033));
-    Memory::set("cbGate",settings->value("cbGate",false));
-    Memory::set("cbCont",settings->value("cbCont",false));
-    Memory::set("cbCoherentAccum",settings->value("cbCoherentAccum",false));
-    Memory::set("cbDDSReset",settings->value("cbDDSReset",true));
-    Memory::set("cbLOGM",settings->value("cbLOGM",false));
-    Memory::set("rbDdsRstBurst",settings->value("rbDdsRstBurst",false));
-    Memory::set("rbDdsRstPulse",settings->value("rbDdsRstPulse",true));
-    Memory::set("rbTxPolXX",settings->value("rbTxPolXX",true));
-    Memory::set("rbTxPolXY",settings->value("rbTxPolXY",false));
-    Memory::set("rbTxPolYX",settings->value("rbTxPolYX",false));
-    Memory::set("rbTxPolYY",settings->value("rbTxPolYY",false));
-    Memory::set("leTxAtt",settings->value("leTxAtt",1));
-    Memory::set("plugins",settings->value("plugins",""));
-    Memory::set("lastFileDir",settings->value("lastFileDir",""));
-    Memory::set("lastPlugDir",settings->value("lastPlugDir",""));*/
-
-
-
+    // Запуск основного рабочего класса и перенаправление его в отдельный поток
     worker = new Worker;
     worker->moveToThread(&workerThread);
     connect(&workerThread, &QThread::finished, worker, &QObject::deleteLater);
@@ -97,16 +43,28 @@ MControl::~MControl(){
     workerThread.quit();
     workerThread.wait();
 }
+/*
+ * Прокси-метод для вызова метода Worker::sendParam
+*/
 void MControl::sendParam(){
     emit sendParamSignals();
 }
+/*
+ * Метод-сигнал изменения сетевого устройства
+*/
 void MControl::setDev(QString dev){
     Memory::set("device",dev);
     saveConfigTimer();
 }
+/*
+ * Прокси-метод, для вызова Worker::sendMsgSlot
+*/
 void MControl::sendMsg(unsigned short BufferSize, unsigned char *Buffer, unsigned short CmdNum){
     emit sendMsgSignal(BufferSize,Buffer,CmdNum);
 }
+/*
+ * Создание окна управления плагинами
+*/
 void MControl::load(){
     plugin = new PlugWin;
     connect(plugin,&PlugWin::sync,this,&MControl::saveConfig);
@@ -114,6 +72,9 @@ void MControl::load(){
     connect(plugin,&PlugWin::hidePlugin,this,&MControl::hidePlugin);
     plugin->load();
 }
+/*
+ * Синхронизация изменения настроек программы (срабатывает от таймера)
+*/
 void MControl::saveConfigTimer(){
     saveTimer->stop();
     QMap<QString, QVariant>::const_iterator i = Memory::dLink->list.constBegin();
@@ -130,6 +91,9 @@ void MControl::saveConfigTimer(){
         Memory::scL["Gorizontal"]->sync();
     }
 }
+/*
+ * Запуск таймера синхронизации. Если таймер работает, прекращаем работу и после этого запускаем
+*/
 void MControl::saveConfig(){
     if(saveTimer->isActive()){
         saveTimer->stop();
@@ -137,6 +101,10 @@ void MControl::saveConfig(){
     saveTimer->start();
     //Memory::scL
 }
+/*
+ * Метод вызывается, когда файл полностью отработан. (горизонтальная поляризация)
+ * Получает финальные данные и отдает из всем графикам
+*/
 void MControl::resultXX(Clowd &dataA,Clowd &dataH){
     int sizeA = dataA.size()*sizeof(float);
     int sizeH = dataH.size()*sizeof(float);
@@ -161,6 +129,10 @@ void MControl::resultXX(Clowd &dataA,Clowd &dataH){
         grOPlotG->shared(Memory::get("Size",1).toInt());
     }
 }
+/*
+ * Метод вызывается, когда файл полностью отработан. (вертикальная поляризация)
+ * Получает финальные данные и отдает из всем графикам
+*/
 void MControl::resultYY(Clowd &dataA, Clowd &dataH){
     int sizeA = dataA.size()*sizeof(float);
     int sizeH = dataH.size()*sizeof(float);
@@ -185,6 +157,10 @@ void MControl::resultYY(Clowd &dataA, Clowd &dataH){
         grOPlotV->shared(Memory::get("Size",1).toInt());
     }
 }
+/*
+ * Обработка команды shared
+ * Передает её всем активным графикам
+*/
 void MControl::shared(int shp){
     if(isgr3dVmdi){
         Memory::scL["Vertical"]->shared(shp);
@@ -213,6 +189,9 @@ void MControl::shared(int shp){
         grOPlotV->shared(shp);
     }
 }
+/*
+ * Метод по расширению файла определяет вызываемых обработчик
+*/
 void MControl::loadData(QString fileName, QByteArray &data){
     QStringList ex = fileName.split(".");
     QString extension = ex[ex.length()-1];
@@ -230,6 +209,9 @@ void MControl::loadData(QString fileName, QByteArray &data){
 void MControl::setMDI(QMdiArea *lnk){
     area = lnk;
 }
+/*
+ * Открытие 3D графика
+*/
 void MControl::showGr3D(QString sType){
     if(sType=="vertical"){
         if(!isgr3dVmdi){
@@ -242,6 +224,7 @@ void MControl::showGr3D(QString sType){
             gr3dVmdi->resize(400,400);
             connect(gr3dVmdi,SIGNAL(destroyed()),this,SLOT(isgr3dVmdiHide()));
             if(hasVData){
+                // Если данные уже есть, то отображаем
                 Clowd bufA, bufP;
                 int size = Memory::get("Size",1024).toInt()*BLOCKLANGTH;
                 bufA.resize(size);
@@ -264,6 +247,7 @@ void MControl::showGr3D(QString sType){
             gr3dGmdi->resize(400,400);
             connect(gr3dGmdi,SIGNAL(destroyed()),this,SLOT(isgr3dGmdiHide()));
             if(hasGData){
+                // Если данные уже есть, то отображаем
                 Clowd bufA, bufP;
                 int size = Memory::get("Size",1024).toInt()*BLOCKLANGTH;
                 bufA.resize(size);
@@ -290,6 +274,7 @@ void MControl::showPlotRastr(QString sType){
             grRPlotVmdi->resize(400,400);
             connect(grRPlotVmdi,SIGNAL(destroyed()),this,SLOT(isgrRPlotVmdiHide()));
             if(hasVData){
+                // Если данные уже есть, то отображаем
                 Clowd bufA, bufP;
                 int size = Memory::get("Size",1024).toInt()*BLOCKLANGTH;
                 bufA.resize(size);
@@ -314,6 +299,7 @@ void MControl::showPlotRastr(QString sType){
             grRPlotGmdi->resize(400,400);
             connect(grRPlotGmdi,SIGNAL(destroyed()),this,SLOT(isgrRPlotGmdiHide()));
             if(hasGData){
+                // Если данные уже есть, то отображаем
                 Clowd bufA, bufP;
                 int size = Memory::get("Size",1024).toInt()*BLOCKLANGTH;
                 bufA.resize(size);
@@ -342,6 +328,7 @@ void MControl::showPlotOsc(QString sType){
             grOPlotVmdi->resize(400,400);
             connect(grOPlotVmdi,SIGNAL(destroyed()),this,SLOT(isgrOPlotVmdiHide()));
             if(hasVData){
+                // Если данные уже есть, то отображаем
                 int size = Memory::get("Size",1024).toInt();
                 grOPlotV->shared(size);
                 grOPlotV->plot();
@@ -361,6 +348,7 @@ void MControl::showPlotOsc(QString sType){
             grOPlotGmdi->resize(400,400);
             connect(grOPlotGmdi,SIGNAL(destroyed()),this,SLOT(isgrOPlotGmdiHide()));
             if(hasGData){
+                // Если данные уже есть, то отображаем
                 int size = Memory::get("Size",1024).toInt();
                 grOPlotG->shared(size);
                 grOPlotG->plot();
@@ -383,6 +371,7 @@ void MControl::showPlotPolarization(QString sType){
             grPlotVmdi->resize(400,400);
             connect(grPlotVmdi,SIGNAL(destroyed()),this,SLOT(isgrPlotVmdiHide()));
             if(hasVData){
+                // Если данные уже есть, то отображаем
                 Clowd bufA, bufP;
                 int size = Memory::get("Size",1024).toInt()*BLOCKLANGTH;
                 bufA.resize(size);
@@ -408,6 +397,7 @@ void MControl::showPlotPolarization(QString sType){
             grPlotGmdi->resize(400,400);
             connect(grPlotGmdi,SIGNAL(destroyed()),this,SLOT(isgrPlotGmdiHide()));
             if(hasGData){
+                // Если данные уже есть, то отображаем
                 Clowd bufA, bufP;
                 int size = Memory::get("Size",1024).toInt()*BLOCKLANGTH;
                 bufA.resize(size);
@@ -451,6 +441,9 @@ void MControl::winOpen(QString winName){
         plugin->show();
 
 }
+/*
+ * Метод, для передачи настроек в систему сохранения
+*/
 void MControl::setAction(QString name, QVariant value){
     Memory::set(name,value);
     settings->setValue(name,value);
@@ -462,6 +455,9 @@ void MControl::log(QString line){
     debug->log(line);
     emit setLog(line);
 }
+/*
+ * Прокси-метод передачи прогресс-бару
+*/
 void MControl::progress(int vl){
     emit setProgress(vl);
     if(isgr3dVmdi)

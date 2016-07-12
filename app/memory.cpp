@@ -12,14 +12,9 @@ Rdata *Memory::dLink = new Rdata();
 
 void Memory::set(QString name, QVariant value){
     dLink->setVariant(name,value);
-//    info[name] = value;
 }
 QVariant Memory::get(QString name, QVariant def){
     return dLink->getVariant(name,def);
-/*    if(info.contains(name))
-        return info[name];
-    return def;
-    */
 }
 void Memory::clearData(){
 //    Memory::dLink->clear();

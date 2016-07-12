@@ -10,6 +10,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    // Настройка openGL
     QSurfaceFormat format;
     format.setDepthBufferSize(24);
     if (QOpenGLContext::openGLModuleType() == QOpenGLContext::LibGL) {
@@ -22,7 +23,6 @@ int main(int argc, char *argv[])
         format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
         format.setProfile(QSurfaceFormat::CoreProfile);
         format.setRenderableType(QSurfaceFormat::OpenGLES);*/
-//        format.setStencilBufferSize(32);
         QSurfaceFormat::setDefaultFormat(format);
 
     qRegisterMetaType<Clowd>("Clowd");
@@ -32,14 +32,12 @@ int main(int argc, char *argv[])
     qRegisterMetaType<QByteArray>("QByteArray&");
     qRegisterMetaType<Clowd>("Clowd&");
 
-
-
     QCoreApplication::setOrganizationName("Nixson LLC");
     QCoreApplication::setOrganizationDomain("nixson.ru");
     QCoreApplication::setApplicationName("Rip3P");
 
-//    Memory::dLink = new Rdata();
     GWindow w;
+    // Запуск основного класса
     w.show();
 
     return a.exec();

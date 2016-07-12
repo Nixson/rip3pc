@@ -15,6 +15,7 @@ GWindow::GWindow(QWidget *parent) :
     control(new MControl)
 {
     ui->setupUi(this);
+    //определение серевых устройств
     QStringList devices;
     pcap_if_t *devlist;
     pcap_if_t *dev;
@@ -49,8 +50,7 @@ GWindow::GWindow(QWidget *parent) :
     }
 
 
-
-
+    //Настройка основных виджетов
     pb = new QProgressBar();
     pb->setMaximum(100);
     pb->setMinimum(0);
@@ -127,7 +127,7 @@ GWindow::GWindow(QWidget *parent) :
     fs->setrbRxAnt1(Memory::get("rbRxAnt1",false).toBool());
 
 
-
+    //Добавление дополнительных виджетов (окон)
     dw["fs"] = new QDockWidget("Настройка сканирования",this);
     dw["fs"]->setFloating(true);
     dw["fs"]->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -178,6 +178,9 @@ GWindow::~GWindow()
     delete ui;
     delete control;
 }
+/*
+ * Загрузка сторонних плагинов
+*/
 void GWindow::loadPlugin(Plugs &plugin){
     if(plugins.contains(plugin.alias)){
         plugActions[plugin.alias]->setVisible(true);
@@ -207,6 +210,9 @@ void GWindow::loadPlugin(Plugs &plugin){
         pluginI->init();
     }
 }
+/*
+ * Скрытие неиспользуемых плагинов
+*/
 void GWindow::hidePlugin(Plugs &plugin){
     if(plugins.contains(plugin.alias))
         plugActions[plugin.alias]->setVisible(false);
@@ -215,13 +221,22 @@ void GWindow::hidePlugin(Plugs &plugin){
 //        plugActions[plugin.alias]->setVisible(false);
     }
 }
+/*
+ * Отображение отладочной информации в панели отладки
+*/
 void GWindow::log(QString msg){
     logLabel->setText(msg);
 }
+/*
+ * Конец загрузки файла или сканирования
+*/
 void GWindow::progressTimerNum(){
     pb->setValue(0);
     pb->hide();
 }
+/*
+ * Метод, отвечающий за синхронизацию настроек и значений в виджете
+*/
 void GWindow::sync(){
     ui->PhMin->setValue(Memory::get("PhMin",0).toInt());
     ui->ArgMax->setValue(Memory::get("ArgMax",1024).toInt());
@@ -229,6 +244,9 @@ void GWindow::sync(){
     control->debug->log("ArgMax: "+QString::number(ui->ArgMax->value()));
     control->debug->log("ArgMin: "+QString::number(ui->ArgMin->value()));
 }
+/*
+ * Метод, отображающий изменения в прогресс-баре
+*/
 void GWindow::progress(int num){
     if(!pb->isVisible())
         pb->show();
@@ -237,7 +255,9 @@ void GWindow::progress(int num){
         QTimer::singleShot(500, this, SLOT(progressTimerNum()));
     }
 }
-
+/*
+ * Метод, с помощью которого добавляются виджеты в основное окно
+*/
 void GWindow::addDock(QString name, QString title){
     dw[name] = new QDockWidget(title,this);
     dw[name]->setFloating(true);
@@ -249,11 +269,17 @@ void GWindow::addDock(QString name, QString title){
     this->setDockNestingEnabled(false);
     dw[name]->hide();
 }
+/*
+ * Событие нажатия кнопки "Замостить"
+*/
 void GWindow::on_mmTile_triggered()
 {
     this->ui->mdiArea->tileSubWindows();
 }
 
+/*
+ * Событие нажатия кнопки "3D модель"
+*/
 void GWindow::on_mm3Dmodel_triggered()
 {
     if(Memory::get("Vpolarization",true).toBool())
@@ -261,6 +287,9 @@ void GWindow::on_mm3Dmodel_triggered()
     else
         control->showGr3D("gorizontal");
 }
+/*
+ * Событие нажатия кнопки "Горизонтальная поляризация"
+*/
 
 void GWindow::on_mmGpolarization_triggered(bool checked)
 {
@@ -269,6 +298,9 @@ void GWindow::on_mmGpolarization_triggered(bool checked)
     control->setAction("Vpolarization",!checked);
     control->debug->log("Gpolarization:"+QString::number(Memory::get("Gpolarization",false).toBool()));
 }
+/*
+ * Событие нажатия кнопки "Вертикальная поляризация"
+*/
 
 void GWindow::on_mmVpolarization_triggered(bool checked)
 {
@@ -277,29 +309,45 @@ void GWindow::on_mmVpolarization_triggered(bool checked)
     control->setAction("Vpolarization",checked);
     control->debug->log("Vpolarization:"+QString::number(Memory::get("Vpolarization",false).toBool()));
 }
+/*
+ * Событие нажатия кнопки "Панель отладки"
+ * Визуализируется виджет отладки
+*/
 
 void GWindow::on_mmDebug_triggered()
 {
     dw["debug"]->show();
     this->setDockNestingEnabled(false);
 }
+/*
+ * Событие нажатия кнопки "Панель отладки"
+ * Открывается окно управления плагинами
+*/
 
 void GWindow::on_mmPlugs_triggered()
 {
     control->winOpen("plugin");
 }
 
+/*
+ * Событие нажатия кнопки "Настройки сигнала"
+ * Открывается окно-виджет настроек РЛМ
+*/
 void GWindow::on_mmSignal_triggered()
 {
     dw["fs"]->show();
     this->setDockNestingEnabled(false);
 }
 
+/*
+ * Событие нажатия кнопки "Загрузить" из меню "Файл"
+ * Открывается окно выбора файла.
+*/
 void GWindow::on_mmLoad_triggered()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Файл 3d объекта"), Memory::get("lastFileDir","").toString(),
             tr("Бинарные файлы (*.dat);;Бинарные файлы (*.3d);;Бинарные файлы (*.3df);;Все файлы (*.*)"));
-    if (fileName != "") {
+    if (fileName != "") {   //Если файл выбран, то определяем расширение
             control->log("Загрузка файла");
             QFile file(fileName);
             Memory::set("lastFileDir",fileName);
@@ -312,20 +360,25 @@ void GWindow::on_mmLoad_triggered()
             QString ext = fNameSpl[fNameSpl.size()-1];
             control->debug->log("ext: "+ext);
             QByteArray data = file.readAll();
-            if(ext=="3d"){
+            if(ext=="3d"){  //если 3d, тогда вызываем окно выбора размера кадра
                 ExtParam *ex = new ExtParam;
                 ex->setData(fileName,data);
                 ex->show();
+                // После определения размеров вызываем Worker::loadFinished
                 connect(ex,&ExtParam::load,control,&MControl::loadData);
                 connect(ex,&ExtParam::sync,this,&GWindow::sync);
                 connect(ex,&ExtParam::log,control,&MControl::log);
                 return;
             }
-            //file.close();
+            // Если dat, вызываем Worker::loadSrc или Worker::loadFinishedF
             emit log(QString::number(data.size()));
             control->loadData(fileName,data);
         }
 }
+/*
+ * Событие изменения максимальной дальности
+ * Сохраняем новое значение и распространяем событие
+*/
 
 void GWindow::on_ArgMax_valueChanged(int value)
 {
@@ -333,23 +386,39 @@ void GWindow::on_ArgMax_valueChanged(int value)
     control->saveConfig();
 }
 
+/*
+ * Событие изменения минимальное дальности
+ * Сохраняем новое значение и распространяем событие
+*/
 void GWindow::on_ArgMin_valueChanged(int value)
 {
     Memory::set("ArgMin",value);
     control->saveConfig();
 }
 
+/*
+ * Событие изменения угла
+ * Сохраняем новое значение и распространяем событие
+*/
 void GWindow::on_PhMin_valueChanged(int value)
 {
     Memory::set("PhMin",value);
     control->saveConfig();
 }
 
+/*
+ * Событие изменения Порога отображения
+ * Сохраняем новое значение и распространяем событие
+*/
 void GWindow::on_Barier_valueChanged(int value)
 {
     Memory::set("Barier",value);
     control->saveConfig();
 }
+/*
+ * Событие нажания кнопки "Растр"
+ * Открывает окно растрового графика
+*/
 
 void GWindow::on_mmRastr_triggered()
 {
@@ -358,6 +427,10 @@ void GWindow::on_mmRastr_triggered()
     else
         control->showPlotRastr("gorizontal");
 }
+/*
+ * Событие нажания кнопки "АФ Растр"
+ * Открывает окно графика АФ Растра
+*/
 
 void GWindow::on_mmAFRastr_triggered()
 {
@@ -366,17 +439,29 @@ void GWindow::on_mmAFRastr_triggered()
     else
         control->showPlotPolarization("gorizontal");
 }
+/*
+ * Событие нажания кнопки "Сохранить"
+ * Открывает окно сохрания резутьтата в файл
+*/
 
 
 void GWindow::on_mmSave_triggered()
 {
     sf->show();
 }
+/*
+ * Событие нажания кнопки "Непрерывный запрос"
+ * Открывает окно запуска режима работы "Непрерывный запрос"
+*/
 
 void GWindow::on_mmControlForm_triggered()
 {
     dw["cf"]->show();
 }
+/*
+ * Событие нажания кнопки "Осцилограмма"
+ * Открывает окно графика Осцилограмма
+*/
 
 void GWindow::on_mmOsc_triggered()
 {
@@ -385,6 +470,10 @@ void GWindow::on_mmOsc_triggered()
     else
         control->showPlotOsc("gorizontal");
 }
+/*
+ * Событие нажания кнопки "Настройка поляризации"
+ * Открывает окно настроек поляризации
+*/
 
 void GWindow::on_mmPolarization_triggered()
 {

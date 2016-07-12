@@ -17,7 +17,6 @@ Worker::Worker(QObject *parent) : QObject(parent)
     PacketNum = 0;
     udp = new UDPSock();
     udp->setAutoDelete(false);
-//    connect(this,&Worker::SendCmdPacket,udp,&UDPSock::SendCmdPacket);
     connect(this,&Worker::updateInterface,udp,&UDPSock::updateInterface);
     connect(this,&Worker::close,udp,&UDPSock::close);
     connect(udp,&UDPSock::Process,this,&Worker::Process);
@@ -27,20 +26,14 @@ Worker::Worker(QObject *parent) : QObject(parent)
     maxColor = 0.0;
     colorStep = 0.0;
     tp = QThreadPool::globalInstance();
-    //tp->reserveThread();
     tp->start(udp);
 
-//    connect(&udpThread, &QThread::finished, udp, &QObject::deleteLater);
-//    udpThread.start();
 }
 Worker::~Worker(){
     emit close();
     udp->close();
     tp->waitForDone();
     p_udpSocket->deleteLater();
-
-    /*tcpThread.quit();
-    tcpThread.wait();*/
 }
 void Worker::Process(QByteArray &data){
     unsigned char *DataPtr = (unsigned char *)data.data() + 10;
@@ -48,13 +41,11 @@ void Worker::Process(QByteArray &data){
     DataPtr += sizeof(int);
     unsigned int CurVarNum = *((unsigned int *) DataPtr);
     DataPtr += sizeof(int);
-    switch(CurVarNum) // фильтр нужных импульсов
-    {
-           case 0 : CurVarNum = 0; break;
-           case 16: CurVarNum = 1; break;
-           case 15: CurVarNum = 2; break;
-           case 31: CurVarNum = 3; break;
-           default: CurVarNum = 33; break;
+    for(int i = 0; i < 4; ++i){
+        if(CurVarNum==bNum[i] || CurVarNum==bNumA[i]){
+            CurVarNum = i;
+        } else
+            CurVarNum = 33;
     }
     if(CurVarNum > 31)
         return;
@@ -112,8 +103,6 @@ void Worker::loadSrc(QByteArray &data){
     initPulse(Memory::get("leSubBufNum",0).toInt(),Memory::get("leFreq",0.0).toDouble());
 
     int bSize = cntD/step;
-    int bNum[4];
-    int bNumA[4];
     bNum[0] = Memory::get("aPhi1v",0).toInt();
     bNum[1] = Memory::get("aPhi2v",16).toInt();
     bNum[2] = Memory::get("aPhi1",15).toInt();
@@ -255,6 +244,20 @@ void Worker::sync(){
     leFreq = Memory::get("leFreq",0.0).toDouble();
     leNumberOfMultOsc = Memory::get("leNumberOfMultOsc",0).toInt();
     leBurstLen = Memory::get("leBurstLen",1).toInt();
+    leGateDelay = Memory::get("leGateDelay",0).toInt();
+    leRasterPeriod = Memory::get("leRasterPeriod",1).toInt();
+    if(leRasterPeriod < 1)
+        leRasterPeriod = 1;
+    bNum[0] = Memory::get("aPhi1v",0).toInt();
+    bNum[1] = Memory::get("aPhi2v",16).toInt();
+    bNum[2] = Memory::get("aPhi1",15).toInt();
+    bNum[3] = Memory::get("aPhi2",31).toInt();
+    bNumA[0] = Memory::get("sPhi1v",0).toInt();
+    bNumA[1] = Memory::get("sPhi2v",16).toInt();
+    bNumA[2] = Memory::get("sPhi1",15).toInt();
+    bNumA[3] = Memory::get("sPhi2",31).toInt();
+
+
     initPulse(leSubBufNum,leFreq);
     int sizeResp = Size*BLOCKLANGTH*2;
     ResUlst = Memory::resultData["Gorizontal"];
@@ -286,12 +289,14 @@ void Worker::attach(){
     }
 }
 void Worker::compile(int startPos,int position,int iNum){
+    if(sharedSt > leRasterPeriod)
+        sharedSt = 0;
     //float *tmpGA,*tmpVA;
     int numPos = 0;//iNum*BLOCKLANGTH;
     //int sInum = iNum;
     for(int bStep = startPos+1; bStep < position; bStep+=2 ){
-        histGY[numPos] = (float)round(ResUlst[bStep]);
-        histVY[numPos] = (float)round(ResUlstY[bStep]);
+        histGY[numPos+sharedSt*BLOCKLANGTH*2] = (float)round(ResUlst[bStep]);
+        histVY[numPos+sharedSt*BLOCKLANGTH*2] = (float)round(ResUlstY[bStep]);
         ++numPos;
     }
     float maxColorArg = maxColor*0.7;
@@ -301,7 +306,6 @@ void Worker::compile(int startPos,int position,int iNum){
     int start = startPos;
     numPos = 0;//iNum*BLOCKLANGTH;
     if(maxColor != colorStep){
-        numPos = 0;
         start = 0;
         //sInum = 0;
         colorStep = maxColor;
@@ -310,11 +314,11 @@ void Worker::compile(int startPos,int position,int iNum){
         float rsp = (float)round(ResUlst[bStep]*norm);
         if(rsp >= (float)QUINT16_SIZE)
             rsp = (float)QUINT16_SIZE-1.0;
-        histGA[numPos] = rsp;
+        histGA[numPos+sharedSt*BLOCKLANGTH*2] = rsp;
         rsp = (float)round(ResUlstY[bStep]*norm);
         if(rsp >= (float)QUINT16_SIZE)
             rsp = (float)QUINT16_SIZE-1.0;
-        histVA[numPos] = rsp;
+        histVA[numPos+sharedSt*BLOCKLANGTH*2] = rsp;
         ++numPos;
     }
 
@@ -323,16 +327,18 @@ void Worker::compile(int startPos,int position,int iNum){
         lastProgress = progressValue;
         emit progress(lastProgress);
     }
-    int range = numPos*sizeof(float);
+    int range = leRasterPeriod*BLOCKLANGTH*2*sizeof(float);
     Memory::setData("vGorizontalAr",histGA.data(),range);
     Memory::setData("vGorizontalPh",histGY.data(),range);
 
     Memory::setData("vVerticalAr",histVA.data(),range);
     Memory::setData("vVerticalPh",histVY.data(),range);
-    emit shared(1);
+    emit shared(leRasterPeriod);
+    ++sharedSt;
 }
 void Worker::run(){
     int sizeResp = Size*BLOCKLANGTH*2;
+    sharedSt = 0;
     ResUlst = Memory::resultData["Gorizontal"];
     ResUlstY = Memory::resultData["Vertical"];
     if(ResUlst.size() != sizeResp){
@@ -407,7 +413,7 @@ void Worker::run(){
 
         compile(lastStep,step,iNum);
         lastStep = step;
-        QThread::msleep(100);
+        //QThread::msleep(100);
     }
     emit progress(100);
     Memory::resultData["Gorizontal"] = ResUlst;

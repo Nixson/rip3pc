@@ -82,7 +82,10 @@ private:
     void sendMsg(QString info, QString address, quint16 port);
     void sendMsg(QByteArray info, QString address, quint16 port);
     void SendCmdPacket(unsigned short BufferSize, unsigned char *Buffer, unsigned short CmdNum);
-    int leSubBufNum, leBurstLen;
+    int leSubBufNum, leBurstLen, leGateDelay, leRasterPeriod, sharedSt;
+    int bNum[4];
+    int bNumA[4];
+
     double leFreq;
     int leNumberOfMultOsc;
 
